@@ -31,7 +31,8 @@ def preprocess(flux_data, meta_data):
 merged = preprocess(train_data, training_meta)
 x_train, x_test, y_train, y_test = train_test_split(merged.loc[:, merged.columns != "target"], merged["target"], test_size=0.33)
 
-clf = RandomForestClassifier(n_estimators=100, class_weight="balanced")
+clf = RandomForestClassifier(n_estimators=1000, class_weight="balanced",
+                             max_depth=1, n_jobs=-1)
 clf.fit(x_train, y_train)
 score = clf.score(x_test, y_test)
 
