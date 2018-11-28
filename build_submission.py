@@ -12,15 +12,16 @@ import model
 import warnings
 warnings.simplefilter("ignore", UserWarning)
 
+TEST_SET = "test_set_sample.csv"
 DATA_DIR = "./data"
-CHUNK = 1000000
-BATCH = 20000
+CHUNK = 100000
+BATCH = 500
 
 train_data = pd.read_csv(os.path.join(DATA_DIR, "training_set.csv"))
 training_meta = pd.read_csv(os.path.join(DATA_DIR, "training_set_metadata.csv"))
 
 # clf = model.MLP(hidden_layer_sizes=(100, 100))
-clf = model.RandomForest(n_estimators=1000, class_weight="balanced", max_depth=3)
+clf = model.RF_GAL_EXTRA(n_estimators=1000, class_weight="balanced", max_depth=3)
 clf.fit(train_data, training_meta)
 
 # Build submission
@@ -33,7 +34,7 @@ test_meta_data = pd.read_csv(os.path.join(DATA_DIR, "test_set_metadata.csv"))
 with tqdm(total=3492890, smoothing=0) as pbar:
 
     predictions = []
-    for flux_df in pd.read_csv(os.path.join(DATA_DIR, "test_set.csv"), chunksize=CHUNK):
+    for flux_df in pd.read_csv(os.path.join(DATA_DIR, TEST_SET), chunksize=CHUNK):
         ids = flux_df["object_id"].unique()
         num_objects = len(ids)
         pred = clf.raw_pred(flux_df, test_meta_data)
@@ -47,5 +48,5 @@ submission.columns = ["object_id", "class_6","class_15","class_16","class_42","c
                       "class_64","class_65","class_67","class_88","class_90","class_92","class_95","class_99"]
 submission["object_id"] = pd.to_numeric(submission["object_id"], downcast="integer")
 submission = submission.groupby("object_id").mean()
-submission.set_index("object_id", inplace=True)
-submission.to_csv("submission.csv")
+# submission.set_index("object_id", inplace=True)
+submission.to_csv("submission.csv", float_format="%g")
