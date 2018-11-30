@@ -12,16 +12,16 @@ import model
 import warnings
 warnings.simplefilter("ignore", UserWarning)
 
-TEST_SET = "test_set_sample.csv"
+TEST_SET = "test_set.csv"
 DATA_DIR = "./data"
-CHUNK = 100000
-BATCH = 500
+CHUNK = 1000000
+# BATCH = 20000
 
 train_data = pd.read_csv(os.path.join(DATA_DIR, "training_set.csv"))
 training_meta = pd.read_csv(os.path.join(DATA_DIR, "training_set_metadata.csv"))
 
 # clf = model.MLP(hidden_layer_sizes=(100, 100))
-clf = model.RF_GAL_EXTRA(n_estimators=1000, class_weight="balanced", max_depth=3)
+clf = model.LGBM()
 clf.fit(train_data, training_meta)
 
 # Build submission
